@@ -5,6 +5,7 @@ const rp = require("request-promise");
 const request = require("request");
 const fs = require('fs');
 const _ = require('lodash');
+var config=require('./config');
 
 export default class extends Base {
   /**
@@ -31,8 +32,8 @@ export default class extends Base {
       qs: {
         grant_type: 'authorization_code',
         js_code: code,
-        secret: '00a2749d6f15e1979194d80b777e6adf',
-        appid: 'wx262f4ac3b1c477dd'
+        secret: config.wxsecret,
+        appid: config.wxappid
       }
     };
 
@@ -41,14 +42,14 @@ export default class extends Base {
 
     sessionData = JSON.parse(sessionData);
     if (!sessionData.openid) {
-      return this.fail('登录失败');
+      return this.fail('登录失败1');
     }
 
     //验证用户信息完整性
     const crypto = require('crypto');
     const sha1 = crypto.createHash('sha1').update(fullUserInfo.rawData + sessionData.session_key).digest('hex');
     if (fullUserInfo.signature !== sha1) {
-      return this.fail('登录失败');
+      return this.fail('登录失败2');
     }
 
     // 根据openid查找用户是否已经注册
@@ -85,7 +86,7 @@ export default class extends Base {
     let sessionKey = await tokenObj.create(sessionData);
 
     if (think.isEmpty(newUserInfo) || think.isEmpty(sessionKey)) {
-      return this.fail('登录失败');
+      return this.fail('登录失败3');
     }
 
     return this.success({ token: sessionKey, userInfo: newUserInfo });
