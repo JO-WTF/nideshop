@@ -59,6 +59,11 @@ export default class extends think.model.base {
       handleOption.pay = true;
     }
 
+    //如果订单为货到付款，没有发货，则可退款操作
+    if (orderInfo.order_status === 200) {
+      handleOption.return = true;
+    }
+
     //如果订单已付款，没有发货，则可退款操作
     if (orderInfo.order_status === 201) {
       handleOption.return = true;
@@ -88,9 +93,35 @@ export default class extends think.model.base {
       case 0:
         statusText = '未付款';
         break;
+			case 200:
+				statusText = '货到付款';
+				break;
+			case 201:
+				statusText = '已付款';
+				break;
+			case 300:
+				statusText = '已发货';
+				break;
+			case 301:
+				statusText = '已收货';
+				break;
     }
 
     return statusText;
   }
 
+  async getOrderPaymentStatusText(orderId){
+    let orderInfo = await this.where({id: orderId}).find();
+    let statusText = '未付款';
+    switch (orderInfo.pay_status) {
+      case 0:
+        statusText = '未付款';
+        break;
+			case 1:
+				statusText = '已付款';
+				break;
+    }
+
+    return statusText;
+  }
 }

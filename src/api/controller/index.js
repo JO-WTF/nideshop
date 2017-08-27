@@ -21,7 +21,7 @@ export default class extends Base {
     let newCategoryList = [];
     for (let categoryItem of categoryList) {
       let childCategoryIds = await this.model('category').where({parent_id: categoryItem.id}).getField('id', 100);
-      let categoryGoods = await this.model('goods').field(['id', 'name', 'list_pic_url', 'retail_price']).where({category_id: ['IN', childCategoryIds]}).limit(7).select();
+      let categoryGoods = await this.model('goods').field(['id', 'name', 'list_pic_url', 'retail_price']).where({category_id: ['IN', childCategoryIds]}).order('sell_volume DESC').limit(7).select();
       newCategoryList.push({
           id: categoryItem.id,
           name: categoryItem.name,
