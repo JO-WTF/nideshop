@@ -74,6 +74,25 @@ export default class extends Base {
     }
 
 		/**
+		 * 更改订单状态
+		 */
+		async changeOrderStatusAction() {
+
+				const orderId = this.get('orderId');
+				const payType = this.get('payType');
+
+				const orderInfo = await this.model('order').where({id: orderId}).find();
+				if (think.isEmpty(orderInfo)) {
+						return this.fail(400, '订单已取消');
+				}
+				console.log(orderInfo)
+
+				await this.model('order').where({ id: orderId }).update({
+		      order_status: 200,
+		    });
+		}
+
+		/**
 		 * 更改订单支付状态: 未支付更改为已支付
 		 */
 		async changePayStatusAction() {
@@ -90,9 +109,9 @@ export default class extends Base {
 						return this.fail(400, '订单已支付，请不要重复操作');
 				}
 
-				newOrderInfo = await this.model('order').where({ id: orderId }).update({
+				await this.model('order').where({ id: orderId }).update({
 		      pay_status: 1,
-					pay_time: parseInt(new Date().getTime() / 1000)
+					// pay_time: parseInt(new Date().getTime() / 1000)
 					/** 待办：
 					 *	pay_id: 支付ID, 如微信支付单号
 					 *	pay_name: 支付人姓名（需要？）
@@ -100,7 +119,6 @@ export default class extends Base {
 					 */
 		    });
 		}
-
 		/**
 		 * 订单通知：货到付款订单直接发送通知；在线支付订单支付状态改变时发送通知
 		 */
@@ -142,11 +160,11 @@ export default class extends Base {
 						data:{
 							first:"接收到新订单！",
 							keyword1:{value:orderInfo.id},
-							keyword2:{value:orderGoodsList},
+							keyword2:{value:"\n"+orderGoodsList},
 							keyword3:{value:orderInfo.actual_price},
-							keyword4:{value:orderInfo.consignee},
-							keyword5:{value:'货到付款'},
-							remark:{value:orderInfo.postscript}
+							keyword4:{value:orderInfo.consignee+'\n地址: '+orderInfo.address},
+							keyword5:{value:'货到付款\n'},
+							remark:{value:'备注: '+orderInfo.postscript}
 						}
 					},
 					json:true

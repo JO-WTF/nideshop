@@ -21,7 +21,7 @@ export default class extends Base {
      */
     async listAction() {
 
-        let orderList = await this.model('order').where({user_id: think.userId}).page(1, 10).countSelect();
+        let orderList = await this.model('order').where({user_id: think.userId}).order('order_sn DESC').page(1, 10).countSelect();
 
         let newOrderList = [];
         for (let item of orderList.data) {
@@ -122,7 +122,7 @@ export default class extends Base {
 
         //订单价格计算
         let orderTotalPrice = goodsTotalPrice + freightPrice - couponPrice;  //订单的总价
-        let actualPrice = orderTotalPrice - 0.00;  //减去其它支付的金额后，要实际支付的金额
+        let actualPrice = orderTotalPrice - couponPrice;  //减去其它支付的金额后，要实际支付的金额
 
 
         let currentTime = parseInt(new Date().getTime() / 1000);
